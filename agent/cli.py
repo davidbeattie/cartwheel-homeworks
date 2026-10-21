@@ -27,6 +27,14 @@ shows the pending tool call and asks whether the tool may run.
 
 from __future__ import annotations
 
+# Inject truststore before any SSL connections are made.
+# Makes Python use the macOS Keychain, which trusts corporate/proxy CA certs.
+try:
+    import truststore
+    truststore.inject_into_ssl()
+except ImportError:
+    pass
+
 import argparse
 import asyncio
 import json

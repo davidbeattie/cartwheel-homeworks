@@ -58,8 +58,9 @@ platform; you serve its shoppers, merchants, and support staff.
 
 ## Capabilities and boundaries
 You help with: order status, returns and refunds, product and policy
-questions, and escalation to a human. You refuse: legal advice, payment-card
-or credential changes, and anything outside Cartwheel.
+questions, and escalation to a human. You refuse: legal advice and anything
+outside Cartwheel. For account or credential changes (email, password,
+payment details), escalate to a human instead of refusing outright.
 
 ## Tool guidance
 - Prefer a tool lookup over memory. Policy answers come from the help
@@ -75,6 +76,11 @@ or credential changes, and anything outside Cartwheel.
 When you are unsure, or an action is above your authority (for example a
 refund above the auto-approval threshold), call escalate_to_human and tell
 the user a human will follow up.
+For account changes of any kind (email address, password, payment
+credentials), always call escalate_to_human. Do not simply refuse these
+requests — a human agent needs to handle them securely. After calling
+escalate_to_human, always tell the user that their request has been passed
+to a human agent and that they will hear back within the stated timeframe.
 
 ## Tone
 Plain and warm. No legalese.
@@ -114,23 +120,35 @@ LITELLM_COURSE_MODELS = {
     "glm-5.2": "together_ai/zai-org/GLM-5.2",
 }
 
+# Ollama cloud models served at https://ollama.com/v1 (OpenAI-compatible).
+# Key comes from OLLAMA_API_KEY in .env. Free plan includes gemma4:31b.
+OLLAMA_CLOUD_MODELS = {"gemma4:31b"}
+OLLAMA_CLOUD_BASE_URL = "https://ollama.com/v1"
+
 
 def resolve_model(name: str | None) -> Any:
     """Turn a course model name into what Agent(model=...) expects.
 
-    OpenAI models pass through as plain strings. Everything else goes through
-    LiteLLM (claude-haiku-4-5 and claude-opus-4-6 via the Anthropic API with
-    ANTHROPIC_API_KEY, glm-5.2 via Together AI with TOGETHER_API_KEY). Same
-    agent code, three providers; only this function changes.
+    OpenAI models pass through as plain strings. Ollama cloud models use
+    LitellmModel with the Ollama OpenAI-compatible base URL and OLLAMA_API_KEY.
+    Everything else goes through LiteLLM (claude-haiku-4-5 and claude-opus-4-6
+    via the Anthropic API with ANTHROPIC_API_KEY, glm-5.2 via Together AI with
+    TOGETHER_API_KEY). Same agent code, four providers; only this function changes.
     """
     import os
+
+    from agents.extensions.models.litellm_model import LitellmModel
 
     name = name or os.environ.get("CARTWHEEL_MODEL") or DEFAULT_MODEL
     if name.startswith("gpt-"):
         return name
+    if name in OLLAMA_CLOUD_MODELS:
+        return LitellmModel(
+            model=f"openai/{name}",
+            base_url=OLLAMA_CLOUD_BASE_URL,
+            api_key=os.environ.get("OLLAMA_API_KEY", ""),
+        )
     litellm_id = LITELLM_COURSE_MODELS.get(name, name)
-    from agents.extensions.models.litellm_model import LitellmModel
-
     return LitellmModel(model=litellm_id)
 
 
