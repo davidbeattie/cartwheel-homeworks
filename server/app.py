@@ -222,6 +222,7 @@ async def post_message(
     return {
         "session_id": session_id,
         "response": result.final_output,
+        "reply": result.final_output,
         "prompt_version": version,
     }
 
@@ -233,3 +234,26 @@ def health() -> dict[str, Any]:
         "db_exists": db_path().exists(),
         "active_sessions": len(_SESSIONS),
     }
+
+
+@app.get("/api/scenarios")
+def get_scenarios(file: str = "scenarios/pilot_scenarios.jsonl") -> list[dict[str, Any]]:
+    """Return parsed scenarios from a JSONL file for the review UI."""
+    path = REPO_ROOT / file
+    if not path.exists():
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail=f"File not found: {file}")
+    scenarios = []
+    for line in path.read_text().splitlines():
+        line = line.strip()
+        if line:
+            scenarios.append(json.loads(line))
+    return scenarios
+
+
+@app.get("/review", response_class=None)
+def review_ui():
+    """Serve the scenario review page."""
+    from fastapi.responses import FileResponse
+    html_path = REPO_ROOT / "analysis" / "ui" / "scenarios.html"
+    return FileResponse(str(html_path), media_type="text/html")

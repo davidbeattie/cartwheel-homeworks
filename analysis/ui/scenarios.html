@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="woodmac">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scenario Review — Cartwheel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Helio Woodmac token foundation ─────────────────────────── */
+    :root {
+      --dimensions-space-0:0px;--dimensions-space-2:2px;--dimensions-space-4:4px;
+      --dimensions-space-6:6px;--dimensions-space-8:8px;--dimensions-space-12:12px;
+      --dimensions-space-16:16px;--dimensions-space-20:20px;--dimensions-space-24:24px;
+      --dimensions-space-32:32px;--dimensions-space-40:40px;--dimensions-space-48:48px;
+      --border-radius-r4:4px;--border-radius-r8:8px;--border-radius-r16:16px;
+      --border-radius-pill:100px;
+      --border-weight-w1:1px;
+      --text-size-ty70:10px;--text-size-ty80:12px;--text-size-ty90:14px;
+      --text-size-ty100:16px;--text-size-ty110:18px;--text-size-ty120:20px;
+      --text-size-ty130:24px;
+      --text-line-height-lh-ty80:20px;--text-line-height-lh-ty90:22px;
+      --text-line-height-lh-ty100:26px;--text-line-height-lh-ty130:34px;
+      --text-weight-regular:400;--text-weight-semi-bold:600;--text-weight-bold:700;
+    }
+    [data-theme="woodmac"] {
+      --text-family-primary:'Manrope',sans-serif;
+      --text-primary:#000000;--text-secondary:#5D5F6F;--text-inverted:#FFFFFF;
+      --text-tertiary:#0024FF;
+      --background-page:#EDEFFC;--background-default-primary:#FFFFFF;
+      --background-hover:#F3F2FD;--background-default-secondary:#F6F6FF;
+      --border-default:#C2C5E6;--border-selected:#5B55B0;
+      --border-width-surface:1px;--border-radius-xs:4px;--border-radius-sm:8px;
+      --border-radius-md:16px;--border-radius-pill:100px;
+      --spacing-space-2:2px;--spacing-space-4:4px;--spacing-space-6:6px;
+      --spacing-space-8:8px;--spacing-space-12:12px;--spacing-space-16:16px;
+      --spacing-space-20:20px;--spacing-space-24:24px;--spacing-space-32:32px;
+      --spacing-space-40:40px;--spacing-space-48:48px;
+      --text-size-caption:12px;--text-size-body-sm:14px;--text-size-body:16px;
+      --text-size-heading-sm:20px;--text-size-heading:24px;
+      --text-line-height-caption:20px;--text-line-height-body-sm:22px;
+      --text-line-height-body:26px;--text-line-height-heading-sm:30px;
+      --text-line-height-heading:34px;
+      --brand-primary:#10005B;
+      --shadows-sm-y:4px;--shadows-sm-blur:12px;--shadows-sm-color:#000F1714;
+      --icons-default:#000000;
+      /* status colours */
+      --coverage-bg:#E5F1ED;--coverage-text:#2E7D32;--coverage-border:#2E7D32;
+      --challenge-bg:#F1E5E5;--challenge-text:#A8011E;--challenge-border:#A8011E;
+      --dq-bg:#FEF6E4;--dq-text:#5F2B01;--dq-border:#ED6C02;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html[data-theme="woodmac"],body{
+      font-family:var(--text-family-primary);
+      font-size:var(--text-size-body);
+      line-height:var(--text-line-height-body);
+      color:var(--text-primary);
+      background-color:var(--background-page);
+    }
+
+    /* ── Layout ─────────────────────────────────────────────────── */
+    .app { display:flex; flex-direction:column; min-height:100vh; }
+
+    header {
+      background:var(--brand-primary);
+      color:var(--text-inverted);
+      padding:var(--spacing-space-16) var(--spacing-space-32);
+      display:flex; align-items:center; justify-content:space-between;
+      position:sticky; top:0; z-index:10;
+      box-shadow:0 var(--shadows-sm-y) var(--shadows-sm-blur) 0 var(--shadows-sm-color);
+    }
+    header h1 { font-size:var(--text-size-heading-sm); font-weight:var(--text-weight-bold); }
+    header .subtitle { font-size:var(--text-size-body-sm); opacity:.75; margin-top:2px; }
+    #stats { font-size:var(--text-size-caption); opacity:.7; text-align:right; }
+
+    .controls {
+      background:var(--background-default-primary);
+      border-bottom:var(--border-width-surface) solid var(--border-default);
+      padding:var(--spacing-space-16) var(--spacing-space-32);
+      display:flex; gap:var(--spacing-space-16); align-items:center; flex-wrap:wrap;
+    }
+    .control-group { display:flex; align-items:center; gap:var(--spacing-space-8); }
+    .control-group label {
+      font-size:var(--text-size-body-sm); font-weight:var(--text-weight-semi-bold);
+      color:var(--text-secondary);
+    }
+    select, input[type=text] {
+      font-family:var(--text-family-primary);
+      font-size:var(--text-size-body-sm);
+      border:var(--border-width-surface) solid var(--border-default);
+      border-radius:var(--border-radius-sm);
+      padding:var(--spacing-space-6) var(--spacing-space-12);
+      background:var(--background-default-primary);
+      color:var(--text-primary);
+      outline:none;
+      min-width:140px;
+    }
+    select:focus, input[type=text]:focus { border-color:var(--border-selected); }
+    #search { min-width:240px; }
+    .count-pill {
+      background:var(--background-default-secondary);
+      border:var(--border-width-surface) solid var(--border-default);
+      border-radius:var(--border-radius-pill);
+      padding:var(--spacing-space-4) var(--spacing-space-12);
+      font-size:var(--text-size-caption); font-weight:var(--text-weight-semi-bold);
+      color:var(--text-secondary); margin-left:auto;
+    }
+
+    main {
+      padding:var(--spacing-space-24) var(--spacing-space-32);
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(440px, 1fr));
+      gap:var(--spacing-space-20);
+      align-items:start;
+    }
+
+    /* ── Scenario card ───────────────────────────────────────────── */
+    .card {
+      background:var(--background-default-primary);
+      border:var(--border-width-surface) solid var(--border-default);
+      border-radius:var(--border-radius-md);
+      padding:var(--spacing-space-20);
+      box-shadow:0 var(--shadows-sm-y) var(--shadows-sm-blur) 0 var(--shadows-sm-color);
+      display:flex; flex-direction:column; gap:var(--spacing-space-12);
+      cursor:pointer;
+      transition:border-color .15s, box-shadow .15s;
+    }
+    .card:hover {
+      border-color:var(--border-selected);
+      box-shadow:0 6px 16px 0 #000F1722;
+    }
+    .card.challenge { border-left:3px solid var(--challenge-border); }
+    .card.coverage  { border-left:3px solid var(--coverage-border); }
+
+    .card-header { display:flex; justify-content:space-between; align-items:flex-start; }
+    .card-id {
+      font-size:var(--text-size-caption); font-weight:var(--text-weight-bold);
+      color:var(--text-secondary); letter-spacing:.04em; text-transform:uppercase;
+    }
+    .badges { display:flex; gap:var(--spacing-space-4); flex-wrap:wrap; }
+
+    .badge {
+      font-size:11px; font-weight:var(--text-weight-semi-bold);
+      padding:2px var(--spacing-space-8); border-radius:var(--border-radius-pill);
+      border:1px solid;
+    }
+    .badge-coverage  { background:var(--coverage-bg);  color:var(--coverage-text);  border-color:var(--coverage-border); }
+    .badge-challenge { background:var(--challenge-bg); color:var(--challenge-text); border-color:var(--challenge-border); }
+    .badge-dq        { background:var(--dq-bg);        color:var(--dq-text);        border-color:var(--dq-border); }
+    .badge-neutral   {
+      background:var(--background-default-secondary);
+      color:var(--text-secondary); border-color:var(--border-default);
+    }
+
+    .card-chips { display:flex; gap:var(--spacing-space-4); flex-wrap:wrap; }
+    .chip {
+      font-size:11px; padding:2px var(--spacing-space-8);
+      border-radius:var(--border-radius-xs);
+      background:var(--background-default-secondary);
+      color:var(--text-secondary);
+      border:1px solid var(--border-default);
+    }
+
+    .message-block { display:flex; flex-direction:column; gap:var(--spacing-space-8); }
+    .message-label {
+      font-size:var(--text-size-caption); font-weight:var(--text-weight-semi-bold);
+      color:var(--text-secondary); text-transform:uppercase; letter-spacing:.05em;
+    }
+    .bubble {
+      background:var(--background-default-secondary);
+      border-radius:var(--border-radius-sm);
+      padding:var(--spacing-space-8) var(--spacing-space-12);
+      font-size:var(--text-size-body-sm);
+      line-height:var(--text-line-height-body-sm);
+      color:var(--text-primary);
+    }
+    .bubble.followup {
+      border-left:3px solid var(--border-selected);
+      margin-top:var(--spacing-space-4);
+    }
+
+    .expected-block {
+      background:var(--background-page);
+      border-radius:var(--border-radius-sm);
+      padding:var(--spacing-space-12);
+      font-size:var(--text-size-body-sm);
+      line-height:var(--text-line-height-body-sm);
+    }
+    .expected-label {
+      font-size:var(--text-size-caption); font-weight:var(--text-weight-semi-bold);
+      color:var(--text-secondary); text-transform:uppercase; letter-spacing:.05em;
+      margin-bottom:var(--spacing-space-4); display:block;
+    }
+    .expected-outcome { font-weight:var(--text-weight-semi-bold); color:var(--text-primary); }
+    .expected-reason  { color:var(--text-secondary); margin-top:var(--spacing-space-4); }
+
+    /* ── Detail drawer ───────────────────────────────────────────── */
+    details { border-top:var(--border-width-surface) solid var(--border-default); padding-top:var(--spacing-space-12); }
+    summary {
+      cursor:pointer; font-size:var(--text-size-body-sm);
+      font-weight:var(--text-weight-semi-bold); color:var(--text-secondary);
+      list-style:none; display:flex; align-items:center; gap:var(--spacing-space-4);
+      user-select:none;
+    }
+    summary::before { content:"▶"; font-size:10px; transition:transform .15s; }
+    details[open] summary::before { transform:rotate(90deg); }
+    .tuple-grid {
+      display:grid; grid-template-columns:auto 1fr;
+      gap:var(--spacing-space-4) var(--spacing-space-16);
+      margin-top:var(--spacing-space-12);
+      font-size:var(--text-size-body-sm);
+    }
+    .tuple-key  { color:var(--text-secondary); font-weight:var(--text-weight-semi-bold); white-space:nowrap; }
+    .tuple-val  { color:var(--text-primary); word-break:break-all; }
+
+    /* ── Empty state ─────────────────────────────────────────────── */
+    .empty {
+      grid-column:1/-1; text-align:center; padding:var(--spacing-space-48);
+      color:var(--text-secondary);
+    }
+
+    /* ── File loader ─────────────────────────────────────────────── */
+    .file-group { display:flex; gap:var(--spacing-space-8); align-items:center; }
+    .file-group select { min-width:260px; }
+    .btn {
+      font-family:var(--text-family-primary);
+      font-size:var(--text-size-body-sm); font-weight:var(--text-weight-semi-bold);
+      padding:var(--spacing-space-6) var(--spacing-space-16);
+      border-radius:var(--border-radius-sm);
+      border:var(--border-width-surface) solid var(--border-selected);
+      background:var(--brand-primary); color:var(--text-inverted);
+      cursor:pointer;
+    }
+    .btn:hover { opacity:.88; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Scenario Review</h1>
+      <div class="subtitle">Cartwheel support agent — HW3</div>
+    </div>
+    <div id="stats">Loading…</div>
+  </header>
+
+  <div class="controls">
+    <div class="file-group control-group">
+      <label for="fileSelect">File</label>
+      <select id="fileSelect">
+        <option value="scenarios/pilot_scenarios.jsonl">pilot_scenarios.jsonl</option>
+        <option value="scenarios/support_scenarios.jsonl">support_scenarios.jsonl</option>
+      </select>
+      <button class="btn" onclick="loadFile()">Load</button>
+    </div>
+
+    <div class="control-group">
+      <label for="groupFilter">Group</label>
+      <select id="groupFilter" onchange="render()">
+        <option value="">All</option>
+        <option value="coverage">Coverage</option>
+        <option value="challenge">Challenge</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label for="roleFilter">Role</label>
+      <select id="roleFilter" onchange="render()">
+        <option value="">All</option>
+        <option value="shopper">Shopper</option>
+        <option value="merchant">Merchant</option>
+        <option value="support">Support</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label for="intentFilter">Intent</label>
+      <select id="intentFilter" onchange="render()"></select>
+    </div>
+
+    <div class="control-group">
+      <label for="search">Search</label>
+      <input id="search" type="text" placeholder="message or ID…" oninput="render()" />
+    </div>
+
+    <span class="count-pill" id="countPill">0 scenarios</span>
+  </div>
+
+  <main id="grid"></main>
+</div>
+
+<script>
+  let ALL = [];
+
+  async function loadFile() {
+    const file = document.getElementById('fileSelect').value;
+    try {
+      const res = await fetch(`/api/scenarios?file=${encodeURIComponent(file)}`);
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      ALL = await res.json();
+      populateIntentFilter();
+      render();
+      updateStats();
+    } catch (e) {
+      document.getElementById('grid').innerHTML =
+        `<div class="empty">Could not load file: ${e.message}</div>`;
+    }
+  }
+
+  function populateIntentFilter() {
+    const intents = [...new Set(ALL.map(s => s.tuple?.intent).filter(Boolean))].sort();
+    const sel = document.getElementById('intentFilter');
+    sel.innerHTML = '<option value="">All</option>' +
+      intents.map(i => `<option value="${i}">${i.replaceAll('_',' ')}</option>`).join('');
+  }
+
+  function updateStats() {
+    const cov = ALL.filter(s => s.scenario_group === 'coverage').length;
+    const cha = ALL.filter(s => s.scenario_group === 'challenge').length;
+    const dq  = ALL.filter(s => s.data_quality_case_id).length;
+    document.getElementById('stats').textContent =
+      `${ALL.length} total · ${cov} coverage · ${cha} challenge · ${dq} DQ`;
+  }
+
+  function render() {
+    const group  = document.getElementById('groupFilter').value;
+    const role   = document.getElementById('roleFilter').value;
+    const intent = document.getElementById('intentFilter').value;
+    const q      = document.getElementById('search').value.trim().toLowerCase();
+
+    const filtered = ALL.filter(s => {
+      if (group  && s.scenario_group !== group) return false;
+      if (role   && s.tuple?.role !== role) return false;
+      if (intent && s.tuple?.intent !== intent) return false;
+      if (q && !JSON.stringify(s).toLowerCase().includes(q)) return false;
+      return true;
+    });
+
+    document.getElementById('countPill').textContent =
+      `${filtered.length} scenario${filtered.length !== 1 ? 's' : ''}`;
+
+    const grid = document.getElementById('grid');
+    if (!filtered.length) {
+      grid.innerHTML = '<div class="empty">No scenarios match the current filters.</div>';
+      return;
+    }
+    grid.innerHTML = filtered.map(renderCard).join('');
+  }
+
+  function renderCard(s) {
+    const grp   = s.scenario_group || '';
+    const t     = s.tuple || {};
+    const exp   = s.expected || {};
+    const isDQ  = !!s.data_quality_case_id;
+
+    const groupBadge = `<span class="badge badge-${grp}">${grp}</span>`;
+    const dqBadge    = isDQ ? `<span class="badge badge-dq">DQ: ${s.data_quality_case_id}</span>` : '';
+    const evalBadge  = `<span class="badge badge-neutral">${exp.evaluation || ''}</span>`;
+
+    const chips = [
+      t.role, t.intent?.replaceAll('_',' '), t.difficulty?.replaceAll('_',' '),
+      t.user_style?.replaceAll('_',' '),
+    ].filter(Boolean).map(c => `<span class="chip">${c}</span>`).join('');
+
+    const followupHtml = (s.followups || []).map(f =>
+      `<div class="bubble followup">↩ ${esc(f)}</div>`
+    ).join('');
+
+    let expectedHtml = '';
+    if (exp.evaluation === 'objective') {
+      expectedHtml = `
+        <div class="expected-block">
+          <span class="expected-label">Expected</span>
+          <div class="expected-outcome">${esc(exp.outcome || '')}</div>
+          <div class="expected-reason">${esc(exp.reason || '')}</div>
+          <div style="margin-top:6px;font-size:11px;color:var(--text-secondary)">
+            Source: ${esc(exp.source?.type || '')} — ${esc(exp.source?.reference || '')}
+          </div>
+        </div>`;
+    } else if (exp.evaluation === 'human_judgment') {
+      expectedHtml = `
+        <div class="expected-block">
+          <span class="expected-label">Criterion (human judgment)</span>
+          <div class="expected-reason">${esc(exp.criterion || '')}</div>
+          <div style="margin-top:6px;font-size:11px;color:var(--text-secondary)">
+            ${esc(exp.source?.reference || '')}
+          </div>
+        </div>`;
+    }
+
+    // Build tuple rows, skipping role (shown as chip)
+    const tupleRows = Object.entries(t)
+      .filter(([k]) => k !== 'role')
+      .map(([k,v]) => `<span class="tuple-key">${k}</span><span class="tuple-val">${v ?? '—'}</span>`)
+      .join('');
+
+    return `
+      <div class="card ${grp}">
+        <div class="card-header">
+          <span class="card-id">${esc(s.id)}</span>
+          <div class="badges">${groupBadge}${dqBadge}${evalBadge}</div>
+        </div>
+        <div class="card-chips">${chips}</div>
+        <div class="message-block">
+          <span class="message-label">Opening message</span>
+          <div class="bubble">${esc(s.opening_message || '')}</div>
+          ${followupHtml}
+        </div>
+        ${expectedHtml}
+        <details>
+          <summary>Tuple details</summary>
+          <div class="tuple-grid">${tupleRows}</div>
+        </details>
+      </div>`;
+  }
+
+  function esc(str) {
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  loadFile();
+</script>
+</body>
+</html>
